@@ -1145,7 +1145,7 @@ public class MobileNetworkSettings extends PreferenceActivity
                         mIsGlobalCdma ||
                         isWorldMode()) {
                     mButtonPreferredNetworkMode.setSummary(
-                            R.string.preferred_network_mode_global_summary);
+                            R.string.preferred_network_mode_global_summary_cm);
                 } else {
                     mButtonPreferredNetworkMode.setSummary(
                             R.string.preferred_network_mode_lte_summary);
@@ -1163,7 +1163,7 @@ public class MobileNetworkSettings extends PreferenceActivity
                 break;
             default:
                 mButtonPreferredNetworkMode.setSummary(
-                        R.string.preferred_network_mode_global_summary);
+                        R.string.preferred_network_mode_global_summary_cm);
         }
     }
 
