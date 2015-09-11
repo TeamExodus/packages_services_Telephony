@@ -358,4 +358,7 @@
     <string name="wb_amr_format" translatable="false">AMR-WB</string>
     <string name="aac_format" translatable="false">AAC</string>
 
+    <string name="voicemail_notification_squelch_title">Disable notifications</string>
+    <string name="voicemail_notification_squelch_summary">Do not show voicemail notifications after booting the device</string>
+
 </resources>

@@ -183,6 +183,8 @@ public class CallFeaturesSetting extends PreferenceActivity
             "button_voicemail_notification_ringtone_key";
     private static final String BUTTON_FDN_KEY   = "button_fdn_key";
 
+    static final String VOICEMAIL_NOTIFICATIONS = "voicemail_notification_squelch";
+
     private static final String BUTTON_DTMF_KEY        = "button_dtmf_settings";
     private static final String BUTTON_RETRY_KEY       = "button_auto_retry_key";
     private static final String BUTTON_TTY_KEY         = "button_tty_mode_key";
@@ -293,6 +295,7 @@ public class CallFeaturesSetting extends PreferenceActivity
     private PreferenceScreen mVoicemailSettings;
     private Preference mVoicemailNotificationRingtone;
     private SwitchPreference mVoicemailNotificationVibrate;
+    private SwitchPreference mVoicemailNotifications;
     private AccountSelectionPreference mDefaultOutgoingAccount;
     private boolean isSpeedDialListStarted = false;
     private PreferenceScreen mButtonBlacklist;
@@ -669,6 +672,9 @@ public class CallFeaturesSetting extends PreferenceActivity
             int index = mCallRecordingFormat.findIndexOfValue((String) objValue);
             Settings.System.putInt(cr, Settings.System.CALL_RECORDING_FORMAT, value);
             mCallRecordingFormat.setSummary(mCallRecordingFormat.getEntries()[index]);
+        } else if (preference == mVoicemailNotifications) {
+            Settings.Exodus.putInt(getContentResolver(),
+                    Settings.Exodus.VOICEMAIL_NOTIFICATIONS, mVoicemailNotifications.isChecked() ? 1 : 0);
         }
         // always let the preference setting proceed.
         return true;
@@ -1734,6 +1740,9 @@ public class CallFeaturesSetting extends PreferenceActivity
                     findPreference(BUTTON_VOICEMAIL_NOTIFICATION_RINGTONE_KEY);
             mVoicemailNotificationVibrate =
                     (SwitchPreference) findPreference(BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY);
+            mVoicemailNotifications =
+                    (SwitchPreference) findPreference(VOICEMAIL_NOTIFICATIONS);
+            mVoicemailNotifications.setOnPreferenceChangeListener(this);
             initVoiceMailProviders();
         }
 
@@ -1906,6 +1915,9 @@ public class CallFeaturesSetting extends PreferenceActivity
             mVoicemailNotificationVibrate.setChecked(prefs.getBoolean(
                     BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY + mPhone.getPhoneId(), false));
         }
+        if (mVoicemailNotifications != null) {
+            mVoicemailNotifications.setChecked(Settings.Exodus.getInt(getContentResolver(), Settings.Exodus.VOICEMAIL_NOTIFICATIONS, 0) == 1);
+        }
 
         // Call recording Format
         mCallRecordingFormat = (ListPreference) findPreference(CALL_RECORDING_FORMAT);
@@ -2053,6 +2065,7 @@ public class CallFeaturesSetting extends PreferenceActivity
             mVoicemailSettings.setIntent(null);
 
             mVoicemailNotificationVibrate.setEnabled(false);
+            mVoicemailNotifications.setEnabled(false);
         } else {
             if (DBG) {
                 log("updateVMPreferenceWidget: provider for the key \"" + key + "\".."
@@ -2065,6 +2078,7 @@ public class CallFeaturesSetting extends PreferenceActivity
             mVoicemailSettings.setIntent(provider.intent);
 
             mVoicemailNotificationVibrate.setEnabled(true);
+            mVoicemailNotifications.setEnabled(true);
         }
     }
 

@@ -68,6 +68,13 @@
           android:persistent="false"
           />
 
+      <SwitchPreference
+          android:key="voicemail_notification_squelch"
+          android:title="@string/voicemail_notification_squelch_title"
+          android:summary="@string/voicemail_notification_squelch_summary"
+          android:defaultValue="false"
+          />
+
   </PreferenceScreen>
 
   <PreferenceScreen

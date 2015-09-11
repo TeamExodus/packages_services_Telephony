@@ -26,6 +26,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -176,6 +177,8 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
     // Old preference key for voicemail notification vibration. Used for migration to the new
     // preference key only.
 
+    static final String VOICEMAIL_NOTIFICATIONS = "voicemail_notification_squelch";
+
     /* package */ static final String BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_WHEN_KEY =
             "button_voicemail_notification_vibrate_when_key";
     /* package */ static final String BUTTON_VOICEMAIL_NOTIFICATION_RINGTONE_KEY =
@@ -275,6 +278,7 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
     private PreferenceScreen mVoicemailSettings;
     private Preference mVoicemailNotificationRingtone;
     private SwitchPreference mVoicemailNotificationVibrate;
+    private SwitchPreference mVoicemailNotifications;
 
     private int mSubId;
     private int mSlotId;
@@ -613,6 +617,9 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             .edit()
             .putBoolean(BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY + mPhone.getPhoneId(),
                     mVoicemailNotificationVibrate.isChecked()).commit();
+        } else if (preference == mVoicemailNotifications) {
+            Settings.Exodus.putInt(getContentResolver(),
+                    Settings.Exodus.VOICEMAIL_NOTIFICATIONS, mVoicemailNotifications.isChecked() ? 1 : 0);
         }
         // always let the preference setting proceed.
         return true;
@@ -1569,6 +1576,9 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             mVoicemailNotificationVibrate =
                     (SwitchPreference) findPreference(BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY);
             mVoicemailNotificationVibrate.setOnPreferenceChangeListener(this);
+            mVoicemailNotifications =
+                    (SwitchPreference) findPreference(VOICEMAIL_NOTIFICATIONS);
+            mVoicemailNotifications.setOnPreferenceChangeListener(this);
 
             initVoiceMailProviders();
         }
@@ -1712,6 +1722,9 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
                 mPhone.getPhoneId())) {
             mVoicemailNotificationVibrate.setChecked(prefs.getBoolean(
                     BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY + mPhone.getPhoneId(), false));
+        }
+        if (mVoicemailNotifications != null) {
+            mVoicemailNotifications.setChecked(Settings.Exodus.getInt(getContentResolver(), Settings.Exodus.VOICEMAIL_NOTIFICATIONS, 0) == 1);
         }
 
         // Look up the default/voicemail ringtone name asynchronously and update its preference.
