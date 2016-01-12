@@ -688,6 +688,16 @@ abstract class TelephonyConnection extends Connection {
         }
     }
 
+    @Override
+    public void onTransfer() {
+        Log.v(this, "onTransfer");
+        try {
+            getPhone().explicitCallTransfer();
+        } catch (CallStateException e) {
+            Log.e(this, e, "Fail to transfer call.");
+        }
+    }
+
     public void performHold() {
         Log.v(this, "performHold");
         // TODO: Can dialing calls be put on hold as well since they take up the
@@ -805,6 +815,11 @@ abstract class TelephonyConnection extends Connection {
         if (phone != null && phone.isInEcm()) {
             callCapabilities |= CAPABILITY_SHOW_CALLBACK_NUMBER;
         }
+
+        if (phone != null && phone.canTransfer()) {
+            callCapabilities |= CAPABILITY_SUPPORTS_TRANSFER;
+        }
+
         return callCapabilities;
     }
 
