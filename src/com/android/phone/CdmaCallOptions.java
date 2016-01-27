@@ -16,9 +16,6 @@
 
 package com.android.phone;
 
-import com.android.internal.telephony.Phone;
-import com.android.internal.telephony.PhoneConstants;
-
 import android.content.DialogInterface;
 import android.os.AsyncResult;
 import android.os.Bundle;
@@ -32,6 +29,10 @@ import android.preference.PreferenceScreen;
 import android.telephony.CarrierConfigManager;
 import android.util.Log;
 import android.view.MenuItem;
+
+import com.android.internal.telephony.Phone;
+import com.android.internal.telephony.PhoneConstants;
+import com.android.internal.telephony.SubscriptionController;
 
 public class CdmaCallOptions extends PreferenceActivity {
     private static final String LOG_TAG = "CdmaCallOptions";
@@ -86,8 +87,34 @@ public class CdmaCallOptions extends PreferenceActivity {
             }
         } else {
             Log.d(LOG_TAG, "Enabled CW CF");
+            PreferenceScreen prefCF = (PreferenceScreen)
+                    prefScreen.findPreference("button_cf_expand_key");
+            if (prefCF != null) {
+                prefCF.getIntent().putExtra(PhoneConstants.SUBSCRIPTION_KEY, phone.getSubId());
+            }
             initCallWaitingPref(this, phone.getPhoneId());
         }
+    }
+
+    public static void initCallWaitingPref(PreferenceActivity activity, int phoneId) {
+        PreferenceScreen prefCWAct = (PreferenceScreen)
+                activity.findPreference("button_cw_act_key");
+        PreferenceScreen prefCWDeact = (PreferenceScreen)
+                activity.findPreference("button_cw_deact_key");
+
+        CdmaCallOptionsSetting callOptionSettings = new CdmaCallOptionsSetting(activity,
+                CALL_WAITING, SubscriptionController.getInstance().getSubIdUsingPhoneId(phoneId));
+
+        PhoneAccountHandle accountHandle = PhoneGlobals.getPhoneAccountHandle(activity, phoneId);
+        prefCWAct.getIntent()
+                .putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, accountHandle)
+                .setData(Uri.fromParts("tel", callOptionSettings.getActivateNumber(), null));
+        prefCWAct.setSummary(callOptionSettings.getActivateNumber());
+
+        prefCWDeact.getIntent()
+                .putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, accountHandle)
+                .setData(Uri.fromParts("tel", callOptionSettings.getDeactivateNumber(), null));
+        prefCWDeact.setSummary(callOptionSettings.getDeactivateNumber());
     }
 
     @Override
