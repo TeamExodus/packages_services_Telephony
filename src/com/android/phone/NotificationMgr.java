@@ -58,7 +58,6 @@ import com.android.phone.settings.VoicemailProviderSettingsUtil;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -339,7 +338,7 @@ public class NotificationMgr {
             }
 
             int resId = android.R.drawable.stat_notify_voicemail;
-            if (mTelephonyManager.getPhoneCount() > 1) {
+            if (showSimSlotIcon()) {
                 resId = mwiIcon[phoneId];
             }
 
@@ -509,6 +508,15 @@ public class NotificationMgr {
         }
 
         return false;
+    }
+
+    private boolean showSimSlotIcon() {
+        final List<SubscriptionInfo> subInfoList =
+                SubscriptionManager.from(mContext).getActiveSubscriptionInfoList();
+        if (subInfoList == null) {
+            return false;
+        }
+        return subInfoList.size() > 1;
     }
 
     /**
