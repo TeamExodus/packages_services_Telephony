@@ -130,6 +130,7 @@
     <uses-permission android:name="android.permission.CHANGE_DEVICE_IDLE_TEMP_WHITELIST" />
     <uses-permission android:name="cyanogenmod.permission.HARDWARE_ABSTRACTION_ACCESS" />
     <uses-permission android:name="com.android.phone.CHANGE_NETWORK_MODE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!-- This tells the activity manager to not delay any of our activity
          start requests, even if they happen immediately after the user
@@ -154,6 +155,12 @@
         <receiver android:name=".MyPhoneNumber">
             <intent-filter>
                 <action android:name="android.intent.action.SIM_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".WifiApStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.wifi.WIFI_AP_STATE_CHANGED" />
             </intent-filter>
         </receiver>
 
