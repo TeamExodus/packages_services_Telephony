@@ -38,6 +38,7 @@ public class CdmaCallOptions extends PreferenceActivity {
     private final boolean DBG = (PhoneGlobals.DBG_LEVEL >= 2);
 
     private static final String BUTTON_VP_KEY = "button_voice_privacy_key";
+    private CheckBoxPreference mButtonVoicePrivacy;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -49,6 +50,7 @@ public class CdmaCallOptions extends PreferenceActivity {
         subInfoHelper.setActionBarTitle(
                 getActionBar(), getResources(), R.string.labelCdmaMore_with_label);
 
+        mButtonVoicePrivacy = (CheckBoxPreference) findPreference(BUTTON_VP_KEY);
         PersistableBundle carrierConfig;
         if (subInfoHelper.hasSubId()) {
             carrierConfig = PhoneGlobals.getInstance().getCarrierConfigForSubId(
@@ -56,37 +58,10 @@ public class CdmaCallOptions extends PreferenceActivity {
         } else {
             carrierConfig = PhoneGlobals.getInstance().getCarrierConfig();
         }
-
-        Phone phone = subInfoHelper.getPhone();
-        Log.d(LOG_TAG, "sub id = " + subInfoHelper.getSubId() + " phone id = " +
-                phone.getPhoneId());
-
-        PreferenceScreen prefScreen = getPreferenceScreen();
-        if (phone.getPhoneType() != PhoneConstants.PHONE_TYPE_CDMA
+        if (subInfoHelper.getPhone().getPhoneType() != PhoneConstants.PHONE_TYPE_CDMA
                 || carrierConfig.getBoolean(CarrierConfigManager.KEY_VOICE_PRIVACY_DISABLE_UI_BOOL)) {
-            CdmaVoicePrivacyCheckBoxPreference prefPri = (CdmaVoicePrivacyCheckBoxPreference)
-                    prefScreen.findPreference("button_voice_privacy_key");
-            if (prefPri != null) {
-                prefPri.setEnabled(false);
-            }
-        }
-
-        if (phone.getPhoneType() != PhoneConstants.PHONE_TYPE_CDMA
-                || !carrierConfig.getBoolean(CarrierConfigManager.KEY_CDMA_CW_CF_ENABLED_BOOL)) {
-            Log.d(LOG_TAG, "Disabled CW CF");
-            PreferenceScreen prefCW = (PreferenceScreen)
-                    prefScreen.findPreference("button_cw_key");
-            if (prefCW != null) {
-                prefCW.setEnabled(false);
-            }
-            PreferenceScreen prefCF = (PreferenceScreen)
-                    prefScreen.findPreference("button_cf_expand_key");
-            if (prefCF != null) {
-                prefCF.setEnabled(false);
-            }
-        } else {
-            Log.d(LOG_TAG, "Enabled CW CF");
-            initCallWaitingPref(this, phone.getPhoneId());
+            // disable the entire screen
+            getPreferenceScreen().setEnabled(false);
         }
     }
 
