@@ -305,7 +305,10 @@ public class CallFeaturesSetting extends PreferenceActivity
                                     new Preference.OnPreferenceClickListener() {
                                         @Override
                                         public boolean onPreferenceClick(Preference preference) {
-                                            Intent intent = new Intent(CdmaCallOptions.CALL_FORWARD_INTENT);
+                                            Intent intent = mPhone.isUtEnabled() ?
+                                                mSubscriptionInfoHelper
+                                                    .getIntent(CallForwardType.class)
+                                                : new Intent(CdmaCallOptions.CALL_FORWARD_INTENT);
                                             intent.putExtra(PhoneConstants.SUBSCRIPTION_KEY, mPhone.getSubId());
                                             startActivity(intent);
                                             return true;
@@ -340,8 +343,10 @@ public class CallFeaturesSetting extends PreferenceActivity
 
         if (ImsManager.isVtEnabledByPlatform(mPhone.getContext()) &&
                 ImsManager.isVtProvisionedOnDevice(mPhone.getContext()) &&
-                mPhone.mDcTracker.isDataEnabled(true) &&
-                (mPhone.getImsPhone() != null)) {
+                (carrierConfig.getBoolean(
+                        CarrierConfigManager.KEY_IGNORE_DATA_ENABLED_CHANGED_FOR_VIDEO_CALLS)
+                        || mPhone.mDcTracker.isDataEnabled(true)) &&
+                        (mPhone.getImsPhone() != null)) {
             boolean currentValue =
                     ImsManager.isEnhanced4gLteModeSettingEnabledByUser(mPhone.getContext())
                     ? PhoneGlobals.getInstance().phoneMgr.isVideoCallingEnabled(
@@ -385,7 +390,8 @@ public class CallFeaturesSetting extends PreferenceActivity
         } else {
             int resId = com.android.internal.R.string.wifi_calling_off_summary;
             if (ImsManager.isWfcEnabledByUser(mPhone.getContext())) {
-                int wfcMode = ImsManager.getWfcMode(mPhone.getContext());
+                boolean isRoaming = telephonyManager.isNetworkRoaming();
+                int wfcMode = ImsManager.getWfcMode(mPhone.getContext(), isRoaming);
                 switch (wfcMode) {
                     case ImsConfig.WfcModeFeatureValueConstants.WIFI_ONLY:
                         resId = com.android.internal.R.string.wfc_mode_wifi_only_summary;
